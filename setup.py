@@ -5,7 +5,7 @@ setup(
     version="0.1.0",
     keywords=("pip", "raspberry pi"),
     description="a framework for raspberry pi developing",
-    long_description="a framework for raspberry pi developing",
+    long_description=open('README.rst').read(),
     license="MIT Licence",
 
     url="https://github.com/Plane-walker/scape",
