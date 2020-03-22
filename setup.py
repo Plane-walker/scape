@@ -8,7 +8,7 @@ setup(
     long_description="a framework for raspberry pi developing",
     license="MIT Licence",
 
-    url="https://github.com/Plane-walker/landscape",
+    url="https://github.com/Plane-walker/scape",
     author="Plane-walker",
     author_email="a990990@163.com",
 
