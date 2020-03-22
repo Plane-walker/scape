@@ -1,0 +1,19 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="scape",
+    version="0.1.0",
+    keywords=("pip", "raspberry pi"),
+    description="a framework for raspberry pi developing",
+    long_description="a framework for raspberry pi developing",
+    license="MIT Licence",
+
+    url="https://github.com/Plane-walker/landscape",
+    author="Plane-walker",
+    author_email="a990990@163.com",
+
+    packages=find_packages(),
+    include_package_data=True,
+    platforms="any",
+    install_requires=[]
+)
