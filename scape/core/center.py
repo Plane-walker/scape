@@ -1,4 +1,4 @@
-class CenterNode:
+class Center:
     def __init__(self):
         self.rules = {}
 

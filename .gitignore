@@ -2,7 +2,6 @@ venv/
 .idea/
 __pycache__/
 *.xml
-*.json
 build/
 dist/
 scape.egg-info/

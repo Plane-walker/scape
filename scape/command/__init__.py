@@ -1,5 +1,4 @@
-from .init import init
-from .run import run
+from .main import run_with_command
 
 
-__all__ = ['init', 'run']
+__all__ = ['run_with_command']
