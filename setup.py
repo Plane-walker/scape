@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="scape",
-    version="0.1.0",
-    keywords=("pip", "raspberry pi"),
+    version="0.5.1",
+    keywords=["pip", "raspberry pi"],
     description="a framework for raspberry pi developing",
     long_description=open('README.rst').read(),
     license="MIT Licence",
@@ -12,7 +12,7 @@ setup(
     author="Plane-walker",
     author_email="a990990@163.com",
 
-    packages=find_packages(),
+    packages=['scape'],
     include_package_data=True,
     platforms="any",
     install_requires=[]
