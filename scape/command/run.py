@@ -1,13 +1,15 @@
 import os
 import importlib
-from scape.core.dispatch import Dispatcher
+from scape.core.dispatch import DispatchPool
+from scape.core.parser import ParserPool
 from scape.core.slot import Slot
 
 
 def run(args):
     settings = importlib.import_module(os.environ.get('SCAPE_SETTINGS'))
-    dispatcher = Dispatcher(settings.EXECUTORS, settings.CENTERS)
-    slot = Slot(dispatcher, settings.SENDERS)
+    DispatchPool(settings.EXECUTORS, 4)
+    ParserPool(settings.PARSERS)
+    slot = Slot(settings.SENSORS)
     slot.start()
 
 

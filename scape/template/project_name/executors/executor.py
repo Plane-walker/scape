@@ -1,6 +1,6 @@
-from scape.action.executor import Executor
+from scape.action.executor import ActionExecutor
 
 
-class ExecutorDemo(Executor):
+class ExecutorDemo(ActionExecutor):
     def __init__(self):
         super().__init__()

@@ -2,10 +2,10 @@ EXECUTORS = [
     'project_name.executors.executor.ExecutorDemo'
 ]
 
-SENDERS = [
-    'project_name.senders.sender.SenderDemo'
+SENSORS = [
+    'project_name.sensors.sensor.SensorDemo'
 ]
 
-CENTERS = [
-    'project_name.centers.center.CenterDemo'
+PARSERS = [
+    'project_name.parsers.parser.ParserDemo'
 ]

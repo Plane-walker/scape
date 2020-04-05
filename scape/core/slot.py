@@ -1,24 +1,27 @@
 import importlib
+from scape.signal.sensor import Sensor
+from scape.core.parser import ParserPool
+from .utils import func_to_str
 
 
-class Slot:
-    def __init__(self, dispatcher, senders):
-        self.dispatcher = dispatcher
-        self.senders = {}
-        for sender in senders:
-            module, sender = sender.rsplit('.', 1)
+class Slot(Sensor):
+    def __init__(self, sensors):
+        super().__init__()
+        self.sensors = {}
+        for sensor in sensors:
+            module, sensor = sensor.rsplit('.', 1)
             module = importlib.import_module(module)
-            sender = getattr(module, sender)()
-            self.senders[sender.__class__.__name__] = sender
+            sensor = getattr(module, sensor)()
+            self.sensors[sensor.__class__.__name__] = sensor
 
     def start(self):
-        for sender in self.senders.values():
-            for signal in sender.loop_signals:
+        for sensor in self.sensors.values():
+            for signal in sensor.loop_signals:
                 signal[0](*(signal[1]))
         while True:
-            for sender in self.senders.values():
-                for signal in sender.loop_signals:
-                    old_status = sender.status[signal[0]]
-                    new_status = signal[0](signal[1])
+            for sensor in self.sensors.values():
+                for signal in sensor.loop_signals:
+                    old_status = sensor.get_status(signal[0])
+                    new_status = signal[0](*(signal[1]))
                     if old_status is not new_status:
-                        self.dispatcher.dispatch(sender, signal[0], new_status)
+                        ParserPool.get_instance().process(sensor.__class__.__name__, func_to_str(signal[0]), old_status, new_status)
