@@ -24,4 +24,4 @@ class Slot(Sensor):
                     old_status = sensor.get_status(signal[0])
                     new_status = signal[0](*(signal[1]))
                     if old_status is not new_status:
-                        ParserPool.get_instance().process(sensor.__class__.__name__, func_to_str(signal[0]), old_status, new_status)
+                        ParserPool.get_instance().process(sensor.__class__.__name__, func_to_str(signal[0]), signal[1], old_status, new_status)

@@ -80,5 +80,3 @@ class DispatchPool:
             dispatcher.start()
         for dispatcher in dispatchers:
             dispatcher.join()
-
-

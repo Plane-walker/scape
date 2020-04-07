@@ -29,8 +29,8 @@ class ParserPool:
             parser = getattr(module, parser)()
             self.parsers[parser.__class__.__name__] = parser
 
-    def process(self, class_name, func_name, old_status, new_status):
+    def process(self, class_name, func_name, args, old_status, new_status):
         index_name = class_name + '.' + func_name
         for parser in self.parsers.values():
             if index_name in parser.rules.keys():
-                parser.rules[index_name]((old_status, new_status))
+                parser.rules[index_name](args, (old_status, new_status))
