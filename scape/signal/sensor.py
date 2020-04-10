@@ -6,14 +6,29 @@ class Sensor:
 class SignalSensor(Sensor):
     def __init__(self):
         super().__init__()
-        self.status = {}
-        self.loop_signals = {}
+        self.__new_status = {}
+        self.__old_status = {}
+        self.__loop_signals = []
 
-    def add_loop_signals(self, *signals):
-        for signal in signals:
-            self.loop_signals[signal[0]] = signal[1]
+    def _update_status(self, signal, args):
+        if not callable(signal):
+            raise
+        status = signal(self, *args)
+        if (signal.__name__, args) in self.__new_status.keys():
+            self.__old_status[(signal.__name__, args)] = self.__new_status[(signal.__name__, args)]
+        else:
+            self.__old_status[(signal.__name__, args)] = None
+        self.__new_status[(signal.__name__, args)] = status
 
-    def get_status(self, signal):
-        if signal in self.status.keys():
-            return self.status[signal]
-        raise
+    def add_loop_signal(self, signal):
+        self.__loop_signals.append(signal)
+
+    def get_old_status(self, signal, args):
+        if (signal.__name__, args) not in self.__old_status.keys():
+            raise
+        return self.__old_status[(signal.__name__, args)]
+
+    def get_new_status(self, signal, args):
+        if (signal.__name__, args) not in self.__new_status.keys():
+            raise
+        return self.__new_status[(signal.__name__, args)]

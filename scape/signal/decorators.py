@@ -1,7 +1,13 @@
-def store_status(signal):
-    def stored(self, *args, **kwargs):
-        status = signal(self, *args, **kwargs)
-        if status is not None:
-            self.stauts[(signal, args, kwargs)] = status
-        return self.stauts[signal]
-    return stored
+from functools import wraps
+
+
+def signal_func(*args):
+    def get_func(func):
+        func.__name__ = '_signal_' + func.__name__
+        @wraps(func)
+        def signals(self):
+            for arg in args:
+                self._update_status(func, arg)
+            return args
+        return signals
+    return get_func

@@ -33,4 +33,4 @@ class ParserPool:
         index_name = class_name + '.' + func_name
         for parser in self.parsers.values():
             if index_name in parser.rules.keys():
-                parser.rules[index_name](args, (old_status, new_status))
+                parser.rules[index_name](args, {'old': old_status, 'new': new_status})
