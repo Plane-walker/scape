@@ -23,14 +23,18 @@ class ParserPool:
 
     def __init__(self, parsers):
         self.parsers = {}
+        self.rules = {}
         for parser in parsers:
             module, parser = parser.rsplit('.', 1)
             module = importlib.import_module(module)
             parser = getattr(module, parser)()
             self.parsers[parser.__class__.__name__] = parser
+            self.rules.update(parser.rules)
 
     def process(self, class_name, func_name, args, old_status, new_status):
         index_name = class_name + '.' + func_name
-        for parser in self.parsers.values():
-            if index_name in parser.rules.keys():
-                parser.rules[index_name](args, {'old': old_status, 'new': new_status})
+        if (index_name, args) in self.rules.keys():
+            self.rules[(index_name, args)](args, {'old': old_status, 'new': new_status})
+            return
+        if index_name in self.rules.keys():
+            self.rules[index_name](args, {'old': old_status, 'new': new_status})
