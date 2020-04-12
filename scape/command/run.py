@@ -1,7 +1,7 @@
 import os
 import importlib
 from scape.core.dispatch import DispatchPool
-from scape.core.parser import ParserPool
+from scape.core.slot import ParserPool
 from scape.core.slot import Slot
 
 
