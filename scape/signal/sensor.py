@@ -32,3 +32,6 @@ class SignalSensor(Sensor):
         if (signal.__name__, args) not in self.__new_status.keys():
             raise
         return self.__new_status[(signal.__name__, args)]
+
+    def get_loop_signals(self):
+        return self.__loop_signals

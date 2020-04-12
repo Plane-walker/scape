@@ -21,7 +21,7 @@ class Slot(Sensor):
         self.signal_recognize()
         while True:
             for sensor in self.sensors.values():
-                for signal in sensor.loop_signals:
+                for signal in sensor.get_loop_signals():
                     args_list = signal()
                     for args in args_list:
                         old_status = sensor.get_old_status(signal, args)

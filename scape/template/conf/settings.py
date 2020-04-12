@@ -1,3 +1,5 @@
+POOL_SIZE = 4
+
 EXECUTORS = [
     'project_name.executors.executor.ExecutorDemo'
 ]
