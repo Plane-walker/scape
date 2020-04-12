@@ -8,6 +8,13 @@ SIGNAL_FUNC = '_signal_[_a-zA-Z0-9]*'
 
 
 class Slot(Sensor):
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self, sensors):
         super().__init__()
         self.sensors = {}
@@ -16,6 +23,10 @@ class Slot(Sensor):
             module = importlib.import_module(module)
             sensor = getattr(module, sensor)()
             self.sensors[sensor.__class__.__name__] = sensor
+
+    @classmethod
+    def get_instance(cls):
+        return cls.__instance
 
     def start(self):
         self.signal_recognize()
@@ -35,3 +46,15 @@ class Slot(Sensor):
                 if callable(getattr(sensor, func)) and re.match(SIGNAL_FUNC, getattr(sensor, func).__name__) is not None:
                     sensor.add_loop_signal(getattr(sensor, func))
                     getattr(sensor, func)()
+
+    def get_status(self, signal_name, args):
+        if signal_name.find('.') == -1:
+            raise
+        sensor, signal = signal_name.split('.', 1)
+        if sensor not in self.sensors.keys():
+            raise
+        sensor = self.sensors[sensor]
+        signal = getattr(sensor, signal)
+        old_status = sensor.get_old_status(signal, args)
+        new_status = sensor.get_new_status(signal, args)
+        return {'old': old_status, 'new': new_status}

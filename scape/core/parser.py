@@ -1,4 +1,5 @@
 import importlib
+from scape.core.slot import Slot
 
 
 class Parser:
@@ -8,9 +9,13 @@ class Parser:
     def add_rule(self, signal, rule):
         self.rules[signal] = rule
 
+    @staticmethod
+    def get_status(signal, args):
+        Slot.get_instance().get_status(signal, args)
+
 
 class ParserPool:
-    _instance = None
+    __instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -19,7 +24,7 @@ class ParserPool:
 
     @classmethod
     def get_instance(cls):
-        return cls._instance
+        return cls.__instance
 
     def __init__(self, parsers):
         self.parsers = {}

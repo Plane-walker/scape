@@ -18,7 +18,7 @@ class Dispatcher(multiprocessing.Process, Executor):
 
 
 class DispatchPool:
-    _instance = None
+    __instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -42,7 +42,7 @@ class DispatchPool:
 
     @classmethod
     def get_instance(cls):
-        return cls._instance
+        return cls.__instance
 
     def create_combine_action(self, name, *func_list):
         self.actions[name] = []
