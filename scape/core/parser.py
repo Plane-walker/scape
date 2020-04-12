@@ -10,4 +10,4 @@ class Parser:
 
     @staticmethod
     def get_status(signal, args):
-        Slot.get_instance().get_status(signal, args)
+        return Slot.get_instance().get_status(signal, args)

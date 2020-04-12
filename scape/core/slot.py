@@ -10,9 +10,9 @@ class Slot(Sensor):
     __instance = None
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     def __init__(self, sensors):
         super().__init__()
@@ -45,6 +45,7 @@ class Slot(Sensor):
                 if callable(getattr(sensor, func)) and re.match(SIGNAL_FUNC, getattr(sensor, func).__name__) is not None:
                     sensor.add_loop_signal(getattr(sensor, func))
                     getattr(sensor, func)()
+                    getattr(sensor, func)()
 
     def get_status(self, signal_name, args):
         if signal_name.find('.') == -1:
@@ -63,9 +64,9 @@ class ParserPool:
     __instance = None
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     @classmethod
     def get_instance(cls):
