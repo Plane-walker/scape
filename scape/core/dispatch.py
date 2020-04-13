@@ -6,15 +6,26 @@ from scape.action.executor import Executor
 
 
 class Dispatcher(multiprocessing.Process, Executor):
-    def __init__(self, action_queue):
+    def __init__(self, action_queue, lock, action_name):
         super().__init__()
         self.action_queue = action_queue
+        self.lock = lock
+        self.action_name = action_name
 
     def run(self):
         while True:
             action_group = self.action_queue.get()
             for action in action_group:
-                action[0](*(action[1]))
+                self.lock.acquire()
+                if action not in self.action_name:
+                    self.action_name.append(action)
+                    self.lock.release()
+                    action[0](*(action[1]))
+                    self.lock.acquire()
+                    self.action_name.remove(action)
+                    self.lock.release()
+                else:
+                    self.lock.release()
 
 
 class DispatchPool:
@@ -35,8 +46,10 @@ class DispatchPool:
         with open(os.path.join(os.getcwd(), 'conf/action.json'), 'r') as f:
             self.actions = json.load(f)
         self.action_queue = multiprocessing.Queue(pool_size)
+        self.lock = multiprocessing.Lock()
+        self.action_name = []
         for index in range(pool_size):
-            dispatcher = Dispatcher(self.action_queue)
+            dispatcher = Dispatcher(self.action_queue, self.lock, self.action_name)
             dispatcher.daemon = True
             dispatcher.start()
 
