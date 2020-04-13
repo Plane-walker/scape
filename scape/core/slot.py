@@ -4,6 +4,7 @@ from scape.signal.sensor import Sensor
 
 
 SIGNAL_FUNC = '_signal_[_a-zA-Z0-9]*'
+NO_LOOP_SIGNAL_FUNC = '_no_loop_signal_[_a-zA-Z0-9]*'
 
 
 class Slot(Sensor):
@@ -44,6 +45,9 @@ class Slot(Sensor):
             for func in dir(sensor):
                 if callable(getattr(sensor, func)) and re.match(SIGNAL_FUNC, getattr(sensor, func).__name__) is not None:
                     sensor.add_loop_signal(getattr(sensor, func))
+                    getattr(sensor, func)()
+                    getattr(sensor, func)()
+                elif callable(getattr(sensor, func)) and re.match(NO_LOOP_SIGNAL_FUNC, getattr(sensor, func).__name__) is not None:
                     getattr(sensor, func)()
                     getattr(sensor, func)()
 
