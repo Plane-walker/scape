@@ -22,13 +22,13 @@ class Slot(Sensor):
             module = importlib.import_module(module)
             sensor = getattr(module, sensor)()
             self.sensors[sensor.__class__.__name__] = sensor
+        self.signal_recognize()
 
     @classmethod
     def get_instance(cls):
         return cls.__instance
 
     def start(self):
-        self.signal_recognize()
         while True:
             for sensor in self.sensors.values():
                 for signal in sensor.get_loop_signals():
@@ -46,6 +46,15 @@ class Slot(Sensor):
                     sensor.add_loop_signal(getattr(sensor, func))
                     getattr(sensor, func)()
                     getattr(sensor, func)()
+
+    def get_signal_args(self, signal_name):
+        if signal_name.find('.') == -1:
+            raise
+        sensor, signal = signal_name.split('.', 1)
+        if sensor not in self.sensors.keys():
+            raise
+        sensor = self.sensors[sensor]
+        return getattr(sensor, signal)()
 
     def get_status(self, signal_name, args):
         if signal_name.find('.') == -1:
@@ -86,6 +95,3 @@ class ParserPool:
         index_name = class_name + '.' + func_name
         if (index_name, args) in self.rules.keys():
             self.rules[(index_name, args)](args, {'old': old_status, 'new': new_status})
-            return
-        if index_name in self.rules.keys():
-            self.rules[index_name](args, {'old': old_status, 'new': new_status})

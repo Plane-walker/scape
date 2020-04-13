@@ -7,9 +7,9 @@ from scape.core.slot import Slot
 
 def run(args):
     settings = importlib.import_module(os.environ.get('SCAPE_SETTINGS'))
-    DispatchPool(settings.EXECUTORS, settings.POOL_SIZE)
-    ParserPool(settings.PARSERS)
     slot = Slot(settings.SENSORS)
+    ParserPool(settings.PARSERS)
+    DispatchPool(settings.EXECUTORS, settings.POOL_SIZE)
     slot.start()
 
 
