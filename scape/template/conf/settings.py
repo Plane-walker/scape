@@ -13,5 +13,5 @@ EXECUTORS = [
 ]
 
 INIT_ACTIVATE_SIGNALS = {
-    'SensorDemo.signal': ()
+    'SensorDemo.signal': [()]
 }

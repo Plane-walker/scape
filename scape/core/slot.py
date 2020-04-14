@@ -25,7 +25,8 @@ class Slot(Sensor):
             self.sensors[sensor.__class__.__name__] = sensor
         self.init_sensors()
         for signal in init_activate_signals:
-            self.activate(signal, init_activate_signals[signal])
+            for arg in init_activate_signals[signal]:
+                self.activate(signal, arg)
 
     @classmethod
     def get_instance(cls):
