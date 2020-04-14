@@ -1,26 +1,15 @@
 from functools import wraps
 
 
-def signal_func(*args):
-    def get_func(func):
-        func.__name__ = '_signal_' + func.__name__
-        @wraps(func)
-        def signals(self):
-            for arg in args:
-                self._update_status(func, arg)
-            return args
+def signal_func(*signal_args):
+    def get_signal(signal):
+        signal.__name__ = '_signal_' + signal.__name__
+        @wraps(signal)
+        def signals(self, *args):
+            if not self.init:
+                for arg in signal_args:
+                    self.init_status(signal, arg)
+                return
+            return self.update_status(signal, args)
         return signals
-    return get_func
-
-
-def no_loop_signal_func(*args):
-    def get_func(func):
-        func.__name__ = '_no_loop_signal_' + func.__name__
-        @wraps(func)
-        def signals(self):
-            for arg in args:
-                self._update_status(func, arg)
-            return args
-        return signals
-    return get_func
-
+    return get_signal
