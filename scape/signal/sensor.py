@@ -23,7 +23,7 @@ class SignalSensor(Sensor):
         super().__init__()
         self.__status = {}
         self.__loop_signals = []
-        self.init = False
+        self.INIT = False
 
     def activate(self, signal, args):
         self.__loop_signals.append((signal, args))
@@ -34,17 +34,17 @@ class SignalSensor(Sensor):
     def is_activate(self, signal, args):
         return (signal.__name__, args) in self.__loop_signals
 
-    def init_status(self, signal, args):
+    def init_signal_status(self, signal, args):
         status = signal(self, *args)
         self.__status[(signal.__name__, args)] = {'old': status, 'new': status}
         return self.__status[(signal.__name__, args)]
 
-    def update_status(self, signal, args):
+    def update_signal_status(self, signal, args):
         self.__status[(signal.__name__, args)]['old'] = self.__status[(signal.__name__, args)]['new']
         self.__status[(signal.__name__, args)]['new'] = signal(self, *args)
         return self.__status[(signal.__name__, args)]
 
-    def get_status(self, signal, args):
+    def get_signal_status(self, signal, args):
         if (signal.__name__, args) not in self.__status.keys():
             raise
         return self.__status[(signal.__name__, args)]

@@ -46,17 +46,17 @@ class Parser:
                 self.signal_count[rule.__name__][1] += 1
 
     @staticmethod
-    def get_status(signal, args):
-        return Slot.get_instance().get_status(signal, args)
+    def get_signal_status(signal, args):
+        return Slot.get_instance().get_signal_status(signal, args)
 
     @staticmethod
-    def signal_status(signal, args):
-        return Slot.get_instance().is_activate(signal, args)
+    def activate(signal, args):
+        return Slot.get_instance().activate(signal, args)
 
     @staticmethod
     def deactivate(signal, args):
         return Slot.get_instance().deactivate(signal, args)
 
     @staticmethod
-    def activate(signal, args):
-        return Slot.get_instance().activate(signal, args)
+    def is_activate(signal, args):
+        return Slot.get_instance().is_activate(signal, args)

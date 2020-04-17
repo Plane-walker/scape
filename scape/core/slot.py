@@ -4,7 +4,6 @@ from scape.signal.sensor import Sensor
 
 
 SIGNAL_FUNC = '_signal_[_a-zA-Z0-9]*'
-NO_LOOP_SIGNAL_FUNC = '_no_loop_signal_[_a-zA-Z0-9]*'
 
 
 class Slot(Sensor):
@@ -42,12 +41,22 @@ class Slot(Sensor):
         signal = getattr(self.sensors[sensor_name], signal_name)
         self.sensors[sensor_name].deactivate(signal, args)
 
+    def is_activate(self, signal_name, args):
+        if signal_name.find('.') == -1:
+            raise
+        sensor, signal = signal_name.split('.', 1)
+        if sensor not in self.sensors.keys():
+            raise
+        sensor = self.sensors[sensor]
+        signal = getattr(sensor, signal)
+        return sensor.is_activate(signal, args)
+
     def init_sensors(self):
         for sensor in self.sensors.values():
             for func in dir(sensor):
                 if callable(getattr(sensor, func)) and re.match(SIGNAL_FUNC, getattr(sensor, func).__name__) is not None:
                     getattr(sensor, func)()
-            sensor.init = True
+            sensor.INIT = True
 
     def start(self):
         while True:
@@ -66,7 +75,7 @@ class Slot(Sensor):
         sensor = self.sensors[sensor]
         return sensor.get_signal_args(getattr(sensor, signal))
 
-    def get_status(self, signal_name, args):
+    def get_signal_status(self, signal_name, args):
         if signal_name.find('.') == -1:
             raise
         sensor, signal = signal_name.split('.', 1)
@@ -74,17 +83,7 @@ class Slot(Sensor):
             raise
         sensor = self.sensors[sensor]
         signal = getattr(sensor, signal)
-        return sensor.get_status(signal, args)
-
-    def is_activate(self, signal_name, args):
-        if signal_name.find('.') == -1:
-            raise
-        sensor, signal = signal_name.split('.', 1)
-        if sensor not in self.sensors.keys():
-            raise
-        sensor = self.sensors[sensor]
-        signal = getattr(sensor, signal)
-        return sensor.is_activate(signal, args)
+        return sensor.get_signal_status(signal, args)
 
 
 class ParserPool:
