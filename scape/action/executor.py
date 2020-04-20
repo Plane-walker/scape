@@ -6,7 +6,7 @@ class Executor:
         pass
 
     @abc.abstractmethod
-    def execute(self, action, args):
+    def execute(self, action):
         pass
 
 
@@ -14,7 +14,7 @@ class ActionExecutor(Executor):
     def __init__(self):
         super().__init__()
 
-    def execute(self, action, args):
-        action = getattr(self, action)
-        if callable(action):
-            action(*args)
+    def execute(self, action):
+        action_func = getattr(self, action.get_name())
+        if callable(action_func):
+            action_func(*(action.get_args()))

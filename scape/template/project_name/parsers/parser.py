@@ -1,4 +1,5 @@
 from scape.core.parser import Parser
+from scape.action.action import CompoundAction
 
 
 class ParserDemo(Parser):
@@ -7,5 +8,6 @@ class ParserDemo(Parser):
         self.add_rule('SensorDemo.signal', self.rule)
 
     def rule(self, args, status):
-        self.deactivate('SensorDemo.signal', ())
-        return 'ExecutorDemo.print_to_screen', (status['new'], )
+        if status['new'] == 'say hello':
+            self.deactivate('SensorDemo.signal', ())
+            return CompoundAction('hello')

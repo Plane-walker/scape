@@ -11,8 +11,8 @@ class Parser:
         def rule_func(*rule_args):
             result = rule(*rule_args)
             if result is not None:
-                action_name, action_args = result
-                return DispatchPool.get_instance().process(action_name, action_args)
+                action = result
+                return DispatchPool.get_instance().process(action)
         if type(signal) is str:
             args = Slot.get_instance().get_signal_args(signal)
             for arg in args:
@@ -28,8 +28,8 @@ class Parser:
             if rule.__name__ not in self.signal_count.keys() or self.signal_count[rule.__name__][0] == 0:
                 result = rule(*rule_args)
                 if result is not None:
-                    action_name, action_args = result
-                    return DispatchPool.get_instance().process(action_name, action_args)
+                    action = result
+                    return DispatchPool.get_instance().process(action)
         if type(signal) is str:
             args = Slot.get_instance().get_signal_args(signal)
             for arg in args:

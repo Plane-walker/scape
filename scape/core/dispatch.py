@@ -1,7 +1,7 @@
 import importlib
 import multiprocessing
 from scape.action.executor import Executor
-from scape.core.compound_action import CompoundAction
+from scape.action.action import Action, CompoundAction
 
 
 class Dispatcher(multiprocessing.Process, Executor):
@@ -17,25 +17,23 @@ class Dispatcher(multiprocessing.Process, Executor):
             executor = getattr(module, executor)()
             self.executors[executor.__class__.__name__] = executor
 
-    def execute(self, action, args):
-        if action.find('.') == -1:
-            raise
-        executor, action = action.split('.', 1)
+    def execute(self, action):
+        executor = action.get_executor_name()
         if executor not in self.executors.keys():
             raise
-        self.executors[executor].execute(action, args)
+        self.executors[executor].execute(action)
 
     def run(self):
         while True:
             action_group = self.action_queue.get()
             for action in action_group:
                 self.lock.acquire()
-                if action not in self.action_name:
-                    self.action_name.append(action)
+                if action.serialize() not in self.action_name:
+                    self.action_name.append(action.serialize())
                     self.lock.release()
-                    self.execute(action[0], action[1])
+                    self.execute(action)
                     self.lock.acquire()
-                    self.action_name.remove(action)
+                    self.action_name.remove(action.serialize())
                     self.lock.release()
                 else:
                     self.lock.release()
@@ -62,10 +60,9 @@ class DispatchPool:
     def get_instance(cls):
         return cls.__instance
 
-    def process(self, action_name, args):
-        if action_name.find('.') != -1:
-            self.action_queue.put([(action_name, args)])
-        else:
-            compound_action = CompoundAction(action_name)
-            for group_action in compound_action.parallel():
-                self.action_queue.put(group_action)
+    def process(self, action):
+        if isinstance(action, Action):
+            self.action_queue.put([action])
+        elif isinstance(action, CompoundAction):
+            for action_group in action.deserialize():
+                self.action_queue.put(action_group)

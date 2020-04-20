@@ -8,4 +8,4 @@ class SensorDemo(SignalSensor):
 
     @signal_func(())
     def signal(self):
-        return 'hello world'
+        return 'say hello'
