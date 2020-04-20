@@ -18,7 +18,7 @@ class Dispatcher(multiprocessing.Process, Executor):
             self.executors[executor.__class__.__name__] = executor
 
     def execute(self, action):
-        executor = action.get_executor_name()
+        executor = action.get_processor_name()
         if executor not in self.executors.keys():
             raise
         self.executors[executor].execute(action)

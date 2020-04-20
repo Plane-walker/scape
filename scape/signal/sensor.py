@@ -6,15 +6,15 @@ class Sensor(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def activate(self, signal, args):
+    def init_signal_status(self, signal):
         pass
 
     @abc.abstractmethod
-    def deactivate(self, signal, args):
+    def update_signal_status(self, signal):
         pass
 
     @abc.abstractmethod
-    def is_activate(self, signal, args):
+    def get_signal_status(self, signal):
         pass
 
 
@@ -25,36 +25,19 @@ class SignalSensor(Sensor):
         self.__loop_signals = []
         self.INIT = False
 
-    def activate(self, signal, args):
-        self.__loop_signals.append((signal, args))
+    def init_signal_status(self, signal):
+        signal_func = getattr(self, signal.get_name())
+        status = signal_func(*(signal.get_args()))
+        self.__status[signal] = {'old': status, 'new': status}
+        return self.__status[signal]
 
-    def deactivate(self, signal, args):
-        self.__loop_signals.remove((signal, args))
+    def update_signal_status(self, signal):
+        self.__status[signal]['old'] = self.__status[signal]['new']
+        signal_func = getattr(self, signal.get_name())
+        self.__status[signal]['new'] = signal_func(*(signal.get_args()))
+        return self.__status[signal]
 
-    def is_activate(self, signal, args):
-        return (signal.__name__, args) in self.__loop_signals
-
-    def init_signal_status(self, signal, args):
-        status = signal(self, *args)
-        self.__status[(signal.__name__, args)] = {'old': status, 'new': status}
-        return self.__status[(signal.__name__, args)]
-
-    def update_signal_status(self, signal, args):
-        self.__status[(signal.__name__, args)]['old'] = self.__status[(signal.__name__, args)]['new']
-        self.__status[(signal.__name__, args)]['new'] = signal(self, *args)
-        return self.__status[(signal.__name__, args)]
-
-    def get_signal_status(self, signal, args):
-        if (signal.__name__, args) not in self.__status.keys():
+    def get_signal_status(self, signal):
+        if signal not in self.__status:
             raise
-        return self.__status[(signal.__name__, args)]
-
-    def get_loop_signals(self):
-        return self.__loop_signals
-
-    def get_signal_args(self, signal):
-        args = []
-        for signal_name, arg in self.__status.keys():
-            if signal_name == signal.__name__:
-                args.append(arg)
-        return args
+        return self.__status[signal]

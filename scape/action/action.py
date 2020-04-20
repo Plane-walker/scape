@@ -1,53 +1,30 @@
 import os
 import json
+from scape.core.event import Event, CompoundEvent
 
 
-class Action:
+class Action(Event):
     def __init__(self, name, args):
-        if name.find('.') == -1:
-            raise
-        self.__executor, self.__name = name.split('.', 1)
-        self.__args = args
-
-    def get_executor_name(self):
-        return self.__executor
-
-    def get_name(self):
-        return self.__name
-
-    def get_args(self):
-        return self.__args
-
-    def serialize(self):
-        return [self.__executor + '.' + self.__name, self.__args]
-
-    def execute(self, executor):
-        executor.execute([self.__name, self.__args])
+        super().__init__(name, args)
 
 
-class CompoundAction:
-    def __init__(self, action_name):
-        self.__action_name = action_name
-        with open(os.path.join(os.getcwd(), 'conf/action.json'), 'r') as f:
-            actions = json.load(f)
-        if action_name not in actions.keys():
-            self.__action_detail = []
-        else:
-            self.__action_detail = actions[action_name]
+class CompoundAction(CompoundEvent):
+    def __init__(self, name):
+        super().__init__(name, 'conf/compound_action.json')
 
     def add_group(self, action_list):
         action_group = []
         for action_obj in action_list:
             action_group.append(action_obj.serialize())
-        self.__action_detail.append(action_group)
-        with open(os.path.join(os.getcwd(), 'conf/action.json'), 'rw') as f:
+        self._detail.append(action_group)
+        with open(os.path.join(os.getcwd(), self._store_path), 'rw') as f:
             actions = json.load(f)
-            actions[self.__action_name] = self.__action_detail
+            actions[self._name] = self._detail
             json.dump(actions, f)
 
     def deserialize(self):
         object_parallel = []
-        for action_group in self.__action_detail:
+        for action_group in self._detail:
             action_list = []
             for action in action_group:
                 action_list.append(Action(action[0], action[1]))

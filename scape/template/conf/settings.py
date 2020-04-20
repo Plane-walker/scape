@@ -11,7 +11,3 @@ PARSERS = [
 EXECUTORS = [
     'project_name.executors.executor.ExecutorDemo'
 ]
-
-INIT_ACTIVATE_SIGNALS = {
-    'SensorDemo.signal': [()]
-}

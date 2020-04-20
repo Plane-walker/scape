@@ -13,50 +13,24 @@ class Parser:
             if result is not None:
                 action = result
                 return DispatchPool.get_instance().process(action)
-        if type(signal) is str:
-            args = Slot.get_instance().get_signal_args(signal)
-            for arg in args:
-                self.rules[(signal, arg)] = rule_func
-        else:
-            self.rules[signal] = rule
+        self.rules[signal] = rule_func
 
-    def add_multi_signal_rule(self, signal, rule):
-        def rule_func(*rule_args):
-            if rule.__name__ in self.signal_count.keys():
-                self.signal_count[rule.__name__][0] += 1
-                self.signal_count[rule.__name__][0] %= self.signal_count[rule.__name__][1]
-            if rule.__name__ not in self.signal_count.keys() or self.signal_count[rule.__name__][0] == 0:
-                result = rule(*rule_args)
-                if result is not None:
-                    action = result
-                    return DispatchPool.get_instance().process(action)
-        if type(signal) is str:
-            args = Slot.get_instance().get_signal_args(signal)
-            for arg in args:
-                self.rules[(signal, arg)] = rule_func
-            if rule.__name__ not in self.signal_count.keys():
-                self.signal_count[rule.__name__] = [0, len(args)]
-            else:
-                self.signal_count[rule.__name__][1] += len(args)
-        else:
-            self.rules[signal] = rule
-            if rule.__name__ not in self.signal_count.keys():
-                self.signal_count[rule.__name__] = [0, 1]
-            else:
-                self.signal_count[rule.__name__][1] += 1
+    def init_activate(self, *signal_list):
+        for signal in signal_list:
+            self.activate(signal)
 
     @staticmethod
-    def get_signal_status(signal, args):
-        return Slot.get_instance().get_signal_status(signal, args)
+    def get_signal_status(signal):
+        return Slot.get_instance().get_signal_status(signal)
 
     @staticmethod
-    def activate(signal, args):
-        return Slot.get_instance().activate(signal, args)
+    def activate(signal):
+        return Slot.get_instance().activate(signal)
 
     @staticmethod
-    def deactivate(signal, args):
-        return Slot.get_instance().deactivate(signal, args)
+    def deactivate(signal):
+        return Slot.get_instance().deactivate(signal)
 
     @staticmethod
-    def is_activate(signal, args):
-        return Slot.get_instance().is_activate(signal, args)
+    def is_activate(signal):
+        return Slot.get_instance().is_activate(signal)
