@@ -30,47 +30,60 @@ class Slot(Sensor):
         return cls.__instance
 
     def init_signal_status(self, signal_obj):
+        signal_list = []
         if isinstance(signal_obj, Signal):
-            sensor = signal_obj.get_processor_name()
+            signal_list = [signal_obj]
+        elif isinstance(signal_obj, CompoundSignal):
+            signal_list = signal_obj.deserialize()
+        for signal in signal_list:
+            sensor = signal.get_processor_name()
             if sensor not in self.sensors.keys():
                 raise
-            self.sensors[sensor].init_signal_status(signal_obj)
-        elif isinstance(signal_obj, CompoundSignal):
-            for signal in signal_obj.deserialize():
-                sensor = signal.get_processor_name()
-                if sensor not in self.sensors.keys():
-                    raise
-                self.sensors[sensor].init_signal_status(signal)
+            self.sensors[sensor].init_signal_status(signal)
 
     def get_signal_status(self, signal_obj):
+        signal_list = []
+        status = []
         if isinstance(signal_obj, Signal):
-            sensor = signal_obj.get_processor_name()
+            signal_list = [signal_obj]
+        elif isinstance(signal_obj, CompoundSignal):
+            signal_list = signal_obj.deserialize()
+        for signal in signal_list:
+            sensor = signal.get_processor_name()
             if sensor not in self.sensors.keys():
                 raise
-            return self.sensors[sensor].update_signal_status(signal_obj)
-        elif isinstance(signal_obj, CompoundSignal):
-            status = []
-            for signal in signal_obj.deserialize():
-                sensor = signal.get_processor_name()
-                if sensor not in self.sensors.keys():
-                    raise
-                status.append(self.sensors[sensor].update_signal_status(signal))
-            return status
+            status.append(self.sensors[sensor].get_signal_status(signal))
+        if len(status) == 1:
+            return status[0]
+        return status
 
     def update_signal_status(self, signal_obj):
+        signal_list = []
+        status = []
         if isinstance(signal_obj, Signal):
-            sensor = signal_obj.get_processor_name()
+            signal_list = [signal_obj]
+        elif isinstance(signal_obj, CompoundSignal):
+            signal_list = signal_obj.deserialize()
+        for signal in signal_list:
+            sensor = signal.get_processor_name()
             if sensor not in self.sensors.keys():
                 raise
-            return self.sensors[sensor].get_signal_status(signal_obj)
+            status.append(self.sensors[sensor].update_signal_status(signal))
+        if len(status) == 1:
+            return status[0]
+        return status
+
+    def remove_signal_status(self, signal_obj):
+        signal_list = []
+        if isinstance(signal_obj, Signal):
+            signal_list = [signal_obj]
         elif isinstance(signal_obj, CompoundSignal):
-            status = []
-            for signal in signal_obj.deserialize():
-                sensor = signal.get_processor_name()
-                if sensor not in self.sensors.keys():
-                    raise
-                status.append(self.sensors[sensor].get_signal_status(signal))
-            return status
+            signal_list = signal_obj.deserialize()
+        for signal in signal_list:
+            sensor = signal.get_processor_name()
+            if sensor not in self.sensors.keys():
+                raise
+            self.sensors[sensor].remove_signal_status(signal)
 
     def activate(self, signal):
         self.activate_signal.append(signal)
@@ -78,6 +91,7 @@ class Slot(Sensor):
 
     def deactivate(self, signal):
         self.activate_signal.remove(signal)
+        self.remove_signal_status(signal)
 
     def is_activate(self, signal):
         return signal in self.activate_signal
