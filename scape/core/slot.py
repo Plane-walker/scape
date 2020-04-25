@@ -127,4 +127,4 @@ class ParserPool:
 
     def process(self, signal, status):
         if signal in self.rules.keys():
-            self.rules[signal](status)
+            self.rules[signal](signal, status)

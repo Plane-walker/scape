@@ -34,6 +34,13 @@ class CompoundEvent(metaclass=abc.ABCMeta):
         else:
             self._detail = events[name]
 
+    def get_name(self):
+        return self._name
+
+    @staticmethod
+    def get_args():
+        return
+
     @abc.abstractmethod
     def add_group(self, event_list):
         pass

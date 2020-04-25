@@ -9,7 +9,7 @@ class ParserDemo(Parser):
         self.add_rule(SignalFactory.make('signal'), self.rule)
         self.init_activate(SignalFactory.make('signal'))
 
-    def rule(self, status):
-        if status[0]['new'] == 'say' and status[1]['new'] == 'hello':
+    def rule(self, signal, status):
+        if signal.get_name() == 'signal' and status[0]['new'] == 'say' and status[1]['new'] == 'hello':
             self.deactivate(SignalFactory.make('signal'))
             return ActionFactory.make('hello')
