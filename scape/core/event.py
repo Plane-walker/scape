@@ -41,3 +41,28 @@ class CompoundEvent(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def deserialize(self):
         pass
+
+
+class EventFactory(metaclass=abc.ABCMeta):
+    event_store = {}
+
+    @classmethod
+    def make(cls, name, args=None):
+        if (name, args) in cls.event_store:
+            return cls.event_store[(name, args)]
+        if args is not None:
+            event = cls.init_event(name, args)
+        else:
+            event = cls.init_compound_event(name)
+        cls.event_store[(name, args)] = event
+        return event
+
+    @classmethod
+    @abc.abstractmethod
+    def init_event(cls, name, args):
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def init_compound_event(cls, name):
+        pass

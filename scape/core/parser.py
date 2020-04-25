@@ -7,13 +7,16 @@ class Parser:
         self.rules = {}
         self.signal_count = {}
 
-    def add_rule(self, signal, rule):
-        def rule_func(*rule_args):
-            result = rule(*rule_args)
-            if result is not None:
-                action = result
-                return DispatchPool.get_instance().process(action)
-        self.rules[signal] = rule_func
+    def add_rule(self, signal_list, rule):
+        if not isinstance(signal_list, list):
+            signal_list = [signal_list]
+        for signal in signal_list:
+            def rule_func(*rule_args):
+                result = rule(*rule_args)
+                if result is not None:
+                    action = result
+                    return DispatchPool.get_instance().process(action)
+            self.rules[signal] = rule_func
 
     def init_activate(self, *signal_list):
         for signal in signal_list:

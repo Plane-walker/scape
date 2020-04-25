@@ -1,6 +1,9 @@
 import os
 import json
-from scape.core.event import Event, CompoundEvent
+from scape.core.event import Event, CompoundEvent, EventFactory
+
+
+__all__ = ['Action', 'CompoundAction', 'ActionFactory']
 
 
 class Action(Event):
@@ -30,3 +33,13 @@ class CompoundAction(CompoundEvent):
                 action_list.append(Action(action[0], action[1]))
             object_parallel.append(action_list)
         return object_parallel
+
+
+class ActionFactory(EventFactory):
+    @classmethod
+    def init_event(cls, name, args):
+        return Action(name, args)
+
+    @classmethod
+    def init_compound_event(cls, name):
+        return CompoundAction(name)

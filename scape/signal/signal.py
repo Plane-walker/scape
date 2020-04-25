@@ -2,7 +2,9 @@ import os
 import json
 
 
-from scape.core.event import Event, CompoundEvent
+__all__ = ['Signal', 'CompoundSignal', 'SignalFactory']
+
+from scape.core.event import Event, CompoundEvent, EventFactory
 
 
 class Signal(Event):
@@ -28,3 +30,13 @@ class CompoundSignal(CompoundEvent):
             for signal in self._detail:
                 self._signal_list.append(Signal(signal[0], signal[1]))
         return self._signal_list
+
+
+class SignalFactory(EventFactory):
+    @classmethod
+    def init_event(cls, name, args):
+        return Signal(name, args)
+
+    @classmethod
+    def init_compound_event(cls, name):
+        return CompoundSignal(name)
