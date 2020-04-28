@@ -9,7 +9,9 @@ class ParserDemo(Parser):
         self.add_rule(SignalFactory.make('signal'), self.rule)
         self.init_activate(SignalFactory.make('signal'))
 
-    def rule(self, signal, status):
+    def rule(self):
+        signal = self.received_signal()
+        status = signal.get_status()
         if signal.get_name() == 'signal' and status[0]['new'] == 'say' and status[1]['new'] == 'hello':
             self.deactivate(SignalFactory.make('signal'))
             return ActionFactory.make('hello')

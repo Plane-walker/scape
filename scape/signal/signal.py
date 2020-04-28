@@ -10,6 +10,17 @@ from scape.core.event import Event, CompoundEvent, EventFactory
 class Signal(Event):
     def __init__(self, name, args):
         super().__init__(name, args)
+        self.__status = {}
+
+    def init_status(self, status):
+        self.__status = {'old': status, 'new': status}
+
+    def update_status(self, status):
+        self.__status['old'] = self.__status['new']
+        self.__status['new'] = status
+
+    def get_status(self):
+        return self.__status
 
 
 class CompoundSignal(CompoundEvent):
@@ -30,6 +41,10 @@ class CompoundSignal(CompoundEvent):
             for signal in self._detail:
                 self._signal_list.append(Signal(signal[0], signal[1]))
         return self._signal_list
+
+    def get_status(self):
+        signals = self.deserialize()
+        return [signal.get_status() for signal in signals]
 
 
 class SignalFactory(EventFactory):

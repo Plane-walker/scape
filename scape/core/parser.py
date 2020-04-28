@@ -6,13 +6,15 @@ class Parser:
     def __init__(self):
         self.rules = {}
         self.signal_count = {}
+        self.__received_signal = None
 
     def add_rule(self, signal_list, rule):
         if not isinstance(signal_list, list):
             signal_list = [signal_list]
         for signal in signal_list:
-            def rule_func(*rule_args):
-                result = rule(*rule_args)
+            def rule_func(received_signal):
+                self.__received_signal = received_signal
+                result = rule()
                 if result is not None:
                     action = result
                     return DispatchPool.get_instance().process(action)
@@ -22,9 +24,8 @@ class Parser:
         for signal in signal_list:
             self.activate(signal)
 
-    @staticmethod
-    def get_signal_status(signal):
-        return Slot.get_instance().get_signal_status(signal)
+    def received_signal(self):
+        return self.__received_signal
 
     @staticmethod
     def activate(signal):

@@ -41,25 +41,8 @@ class Slot(Sensor):
                 raise
             self.sensors[sensor].init_signal_status(signal)
 
-    def get_signal_status(self, signal_obj):
-        signal_list = []
-        status = []
-        if isinstance(signal_obj, Signal):
-            signal_list = [signal_obj]
-        elif isinstance(signal_obj, CompoundSignal):
-            signal_list = signal_obj.deserialize()
-        for signal in signal_list:
-            sensor = signal.get_processor_name()
-            if sensor not in self.sensors.keys():
-                raise
-            status.append(self.sensors[sensor].get_signal_status(signal))
-        if len(status) == 1:
-            return status[0]
-        return status
-
     def update_signal_status(self, signal_obj):
         signal_list = []
-        status = []
         if isinstance(signal_obj, Signal):
             signal_list = [signal_obj]
         elif isinstance(signal_obj, CompoundSignal):
@@ -68,30 +51,16 @@ class Slot(Sensor):
             sensor = signal.get_processor_name()
             if sensor not in self.sensors.keys():
                 raise
-            status.append(self.sensors[sensor].update_signal_status(signal))
-        if len(status) == 1:
-            return status[0]
-        return status
-
-    def remove_signal_status(self, signal_obj):
-        signal_list = []
-        if isinstance(signal_obj, Signal):
-            signal_list = [signal_obj]
-        elif isinstance(signal_obj, CompoundSignal):
-            signal_list = signal_obj.deserialize()
-        for signal in signal_list:
-            sensor = signal.get_processor_name()
-            if sensor not in self.sensors.keys():
-                raise
-            self.sensors[sensor].remove_signal_status(signal)
+            self.sensors[sensor].update_signal_status(signal)
 
     def activate(self, signal):
-        self.activate_signal.append(signal)
-        self.init_signal_status(signal)
+        if signal not in self.activate_signal:
+            self.activate_signal.append(signal)
+            self.init_signal_status(signal)
 
     def deactivate(self, signal):
-        self.activate_signal.remove(signal)
-        self.remove_signal_status(signal)
+        if signal in self.activate_signal:
+            self.activate_signal.remove(signal)
 
     def is_activate(self, signal):
         return signal in self.activate_signal
@@ -99,8 +68,8 @@ class Slot(Sensor):
     def start(self):
         while True:
             for signal in self.activate_signal:
-                status = self.update_signal_status(signal)
-                ParserPool.get_instance().process(signal, status)
+                self.update_signal_status(signal)
+                ParserPool.get_instance().process(signal)
 
 
 class ParserPool:
@@ -125,6 +94,6 @@ class ParserPool:
             self.parsers[parser.__class__.__name__] = parser
             self.rules.update(parser.rules)
 
-    def process(self, signal, status):
+    def process(self, signal):
         if signal in self.rules.keys():
-            self.rules[signal](signal, status)
+            self.rules[signal](signal)
