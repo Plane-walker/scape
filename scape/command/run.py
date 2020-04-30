@@ -1,5 +1,6 @@
 import os
 import importlib
+import logging
 from scape.core.dispatch import DispatchPool
 from scape.core.slot import ParserPool
 from scape.core.slot import Slot
@@ -12,6 +13,8 @@ class RunCommand(BaseCommand):
 
     @staticmethod
     def run():
+        logger = logging.getLogger("scape")
+        logger.info('Initialize...')
         settings = importlib.import_module(os.environ.get('SCAPE_SETTINGS'))
         slot = Slot(settings.SENSORS)
         ParserPool(settings.PARSERS)
