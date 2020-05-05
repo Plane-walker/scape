@@ -1,7 +1,7 @@
 import abc
 
 
-class Executor:
+class Executor(metaclass=abc.ABCMeta):
     def __init__(self):
         pass
 

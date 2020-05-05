@@ -4,9 +4,6 @@ from scape.signal.sensor import Sensor
 from scape.signal.signal import Signal, CompoundSignal
 
 
-SIGNAL_FUNC = '_signal_[_a-zA-Z0-9]*'
-
-
 class Slot(Sensor):
     __instance = None
 

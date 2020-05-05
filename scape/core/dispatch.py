@@ -1,21 +1,22 @@
 import importlib
 import multiprocessing
+import time
 from scape.action.executor import Executor
-from scape.action.action import Action, CompoundAction
+from scape.action.action import Action, CompoundAction, ActionFactory
 
 
 class Dispatcher(multiprocessing.Process, Executor):
-    def __init__(self, executors, action_queue, lock, action_name):
+    def __init__(self, executors, action_queue, lock):
         super().__init__()
-        self.action_queue = action_queue
-        self.lock = lock
-        self.action_name = action_name
         self.executors = {}
         for executor in executors:
             module, executor = executor.rsplit('.', 1)
             module = importlib.import_module(module)
             executor = getattr(module, executor)()
             self.executors[executor.__class__.__name__] = executor
+        self.action_queue = action_queue
+        self.lock = lock
+        self.action = None
 
     def execute(self, action):
         executor = action.get_processor_name()
@@ -25,18 +26,18 @@ class Dispatcher(multiprocessing.Process, Executor):
 
     def run(self):
         while True:
-            action_group = self.action_queue.get()
-            for action in action_group:
+            if self.action is None:
+                self.action = self.action_queue.get()
+            if isinstance(self.action, Action):
+                self.execute(self.action)
                 self.lock.acquire()
-                if action.serialize() not in self.action_name:
-                    self.action_name.append(action.serialize())
-                    self.lock.release()
-                    self.execute(action)
-                    self.lock.acquire()
-                    self.action_name.remove(action.serialize())
-                    self.lock.release()
-                else:
-                    self.lock.release()
+                self.action = self.action.activate_next()
+                self.lock.release()
+            elif isinstance(self.action, CompoundAction):
+                object_parallel = self.action.deserialize()
+                self.action = object_parallel[0][0]
+                for action_group in object_parallel[1:]:
+                    self.action_queue.put(action_group[0])
 
 
 class DispatchPool:
@@ -49,20 +50,40 @@ class DispatchPool:
 
     def __init__(self, executors, pool_size):
         self.action_queue = multiprocessing.Queue(pool_size)
-        self.lock = multiprocessing.Lock()
-        self.action_name = []
+        executors.append('scape.action.utils.Delayer')
         for index in range(pool_size):
-            dispatcher = Dispatcher(executors, self.action_queue, self.lock, self.action_name)
+            dispatcher = Dispatcher(executors, self.action_queue, multiprocessing.Lock())
             dispatcher.daemon = True
             dispatcher.start()
+        self.record_actions = None
+        self.record = False
+        self.begin_time = None
+        self.end_time = None
 
     @classmethod
     def get_instance(cls):
         return cls.__instance
 
+    def start_record(self):
+        self.record = True
+
+    def stop_record(self, compound_action):
+        self.record = False
+        self.begin_time = None
+        compound_action.add_group(*self.record_actions)
+        self.record_actions = None
+        return compound_action
+
     def process(self, action):
+        if self.record:
+            self.end_time = time.time()
+            if self.begin_time is not None:
+                self.record_actions.append(ActionFactory.make('Delayer.delay', (self.end_time - self.begin_time,)))
+            self.record_actions.append(action)
         if isinstance(action, Action):
-            self.action_queue.put([action])
+            self.action_queue.put(action)
         elif isinstance(action, CompoundAction):
             for action_group in action.deserialize():
-                self.action_queue.put(action_group)
+                self.action_queue.put(action_group[0])
+        if self.record and self.begin_time is None:
+            self.begin_time = time.time()

@@ -26,7 +26,7 @@ Quick start
     cd <project name>
     python manage.py run
 
-The project should print the following words to the screen.
+The project should print the following words to the screen(the order of words may differ).
 ::
 
     hello world

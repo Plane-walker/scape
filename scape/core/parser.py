@@ -38,3 +38,11 @@ class Parser:
     @staticmethod
     def is_activate(signal):
         return Slot.get_instance().is_activate(signal)
+
+    @staticmethod
+    def start_record(compound_action):
+        DispatchPool.get_instance().start_record(compound_action)
+
+    @staticmethod
+    def stop_record():
+        DispatchPool.get_instance().stop_record()
