@@ -33,3 +33,8 @@ class InitCommand(BaseCommand):
                     os.makedirs(project_path)
                 for file in files:
                     shutil.copy(os.path.join(root, file), os.path.join(project_path, file))
+        with open(os.path.join(project_base, 'conf/settings.py'), 'r') as f:
+            content = f.read()
+        with open(os.path.join(project_base, 'conf/settings.py'), 'w') as f:
+            content = content.replace('project_name', args[0])
+            f.write(content)

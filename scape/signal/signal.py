@@ -31,8 +31,9 @@ class CompoundSignal(CompoundEvent):
     def add_group(self, signal_list):
         for signal_obj in signal_list:
             self._detail.append(signal_obj.serialize())
-        with open(os.path.join(os.getcwd(), self._store_path), 'rw') as f:
+        with open(os.path.join(os.getcwd(), self._store_path), 'r') as f:
             actions = json.load(f)
+        with open(os.path.join(os.getcwd(), self._store_path), 'w') as f:
             actions[self._name] = self._detail
             json.dump(actions, f)
 
