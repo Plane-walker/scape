@@ -26,3 +26,8 @@ DEFAULT_LOGGING = {
         }
     }
 }
+
+INNER_EXECUTORS = [
+    'scape.action.inner_executor.Delayer',
+    'scape.action.inner_executor.Activator'
+]

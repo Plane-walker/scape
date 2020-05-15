@@ -14,30 +14,15 @@ class Parser:
         for signal in signal_list:
             def rule_func(received_signal):
                 self.__received_signal = received_signal
-                result = rule()
-                if result is not None:
-                    action = result
-                    return DispatchPool.get_instance().process(action)
+                rule()
             self.rules[signal] = rule_func
-
-    def init_activate(self, *signal_list):
-        for signal in signal_list:
-            self.activate(signal)
 
     def received_signal(self):
         return self.__received_signal
 
     @staticmethod
-    def activate(signal):
-        return Slot.get_instance().activate(signal)
-
-    @staticmethod
-    def deactivate(signal):
-        return Slot.get_instance().deactivate(signal)
-
-    @staticmethod
-    def is_activate(signal):
-        return Slot.get_instance().is_activate(signal)
+    def process(action):
+        DispatchPool.get_instance().process(action)
 
     @staticmethod
     def start_record(compound_action):

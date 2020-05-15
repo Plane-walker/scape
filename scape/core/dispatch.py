@@ -2,6 +2,7 @@ import importlib
 import multiprocessing
 import time
 from scape.action.executor import Executor
+from scape.conf.settings import INNER_EXECUTORS
 from scape.action.action import Action, CompoundAction, ActionFactory
 
 
@@ -49,8 +50,13 @@ class DispatchPool:
         return cls.__instance
 
     def __init__(self, executors, pool_size):
+        self.inner_executors = {}
+        for executor in INNER_EXECUTORS:
+            module, executor = executor.rsplit('.', 1)
+            module = importlib.import_module(module)
+            executor = getattr(module, executor)()
+            self.inner_executors[executor.__class__.__name__] = executor
         self.action_queue = multiprocessing.Queue(pool_size)
-        executors.append('scape.action.utils.Delayer')
         for index in range(pool_size):
             dispatcher = Dispatcher(executors, self.action_queue, multiprocessing.Lock())
             dispatcher.daemon = True
@@ -75,6 +81,11 @@ class DispatchPool:
         return compound_action
 
     def process(self, action):
+        if isinstance(action, Action):
+            executor = action.get_processor_name()
+            if executor in self.inner_executors.keys():
+                self.inner_executors[executor].execute(action)
+                return
         if self.record:
             self.end_time = time.time()
             if self.begin_time is not None:
