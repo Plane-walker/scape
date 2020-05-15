@@ -1,5 +1,6 @@
 import importlib
 import logging
+import signal as listener
 from scape.signal.sensor import Sensor
 from scape.signal.signal import Signal, CompoundSignal
 
@@ -65,6 +66,7 @@ class Slot(Sensor):
     def start(self):
         logger = logging.getLogger('scape')
         logger.info('Scape started.')
+        listener.signal(listener.SIGINT, lambda sig_id, handle: exit())
         while True:
             for signal in self.activate_signal:
                 self.update_signal_status(signal)
