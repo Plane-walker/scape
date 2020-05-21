@@ -1,4 +1,3 @@
-from scape.core.slot import Slot
 from scape.core.dispatch import DispatchPool
 
 
@@ -22,7 +21,7 @@ class Parser:
 
     @staticmethod
     def process(action):
-        DispatchPool.get_instance().process(action)
+        return DispatchPool.get_instance().process(action)
 
     @staticmethod
     def start_record(compound_action):
