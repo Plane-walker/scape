@@ -22,6 +22,14 @@ class Signal(Event):
     def get_status(self):
         return self.__status
 
+    def rising_edge(self):
+        if self.__status['old'] == 0 and self.__status['new'] == 1:
+            return True
+        return False
+
+    def has_status(self, status):
+        return status == self.__status['new']
+
 
 class CompoundSignal(CompoundEvent):
     def __init__(self, name):
