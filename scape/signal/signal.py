@@ -11,6 +11,7 @@ class Signal(Event):
     def __init__(self, name, args):
         super().__init__(name, args)
         self.__status = {}
+        self.__signal_lock = 0
 
     def init_status(self, status):
         self.__status = {'old': status, 'new': status}
@@ -29,6 +30,15 @@ class Signal(Event):
 
     def has_status(self, status):
         return status == self.__status['new']
+
+    def lock(self):
+        self.__signal_lock = 1
+
+    def unlock(self):
+        self.__signal_lock = 0
+
+    def is_lock(self):
+        return self.__signal_lock == 1
 
 
 class CompoundSignal(CompoundEvent):
@@ -54,6 +64,20 @@ class CompoundSignal(CompoundEvent):
     def get_status(self):
         signals = self.deserialize()
         return [signal.get_status() for signal in signals]
+
+    def lock(self):
+        for signal in self._signal_list:
+            signal.lock()
+
+    def unlock(self):
+        for signal in self._signal_list:
+            signal.unlock()
+
+    def is_lock(self):
+        for signal in self._signal_list:
+            if signal.is_lock() == 1:
+                return 1
+        return 0
 
 
 class SignalFactory(EventFactory):

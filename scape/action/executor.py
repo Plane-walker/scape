@@ -17,4 +17,5 @@ class ActionExecutor(Executor):
     def execute(self, action):
         action_func = getattr(self, action.get_name())
         if callable(action_func):
-            return action_func(*(action.get_args()))
+            action_func(*(action.get_args()))
+            action.try_unlock_signal()

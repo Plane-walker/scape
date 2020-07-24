@@ -11,6 +11,7 @@ class Action(Event):
         super().__init__(name, args)
         self.__active = False
         self.__next_action = None
+        self.__signal = None
 
     def set_next(self, action):
         self.__next_action = action
@@ -27,12 +28,21 @@ class Action(Event):
         self.__next_action.activate()
         return self.__next_action
 
+    def add_locked_signal(self, signal):
+        self.__signal = signal
+
+    def try_unlock_signal(self):
+        if self.__signal is not None:
+            self.__signal.unlock()
+            self.__signal = None
+
 
 class CompoundAction(CompoundEvent):
     def __init__(self, name):
         super().__init__(name, 'conf/compound_action.json')
         self.__active = False
         self.__next_action = None
+        self.__signal = None
 
     def add_group(self, action_list):
         action_group = []
@@ -67,6 +77,14 @@ class CompoundAction(CompoundEvent):
 
     def activate(self):
         self.__active = True
+
+    def add_locked_signal(self, signal):
+        self.__signal = signal
+
+    def try_unlock_signal(self):
+        if self.__signal is not None:
+            self.__signal.unlock()
+            self.__signal = None
 
 
 class ActionFactory(EventFactory):

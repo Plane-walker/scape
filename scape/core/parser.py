@@ -12,6 +12,8 @@ class Parser:
             signal_list = [signal_list]
         for signal in signal_list:
             def rule_func(received_signal):
+                if received_signal.is_lock():
+                    return
                 self.__received_signal = received_signal
                 rule()
             self.rules[signal] = rule_func
@@ -19,14 +21,8 @@ class Parser:
     def received_signal(self):
         return self.__received_signal
 
-    @staticmethod
-    def process(action):
+    def process(self, action, transaction=False):
+        if transaction:
+            self.__received_signal.lock()
+            action.add_locked_signal(self.__received_signal)
         return DispatchPool.get_instance().process(action)
-
-    @staticmethod
-    def start_record(compound_action):
-        DispatchPool.get_instance().start_record(compound_action)
-
-    @staticmethod
-    def stop_record():
-        DispatchPool.get_instance().stop_record()
