@@ -31,10 +31,8 @@ class Action(Event):
     def add_locked_signal(self, signal):
         self.__signal = signal
 
-    def try_unlock_signal(self):
-        if self.__signal is not None:
-            self.__signal.unlock()
-            self.__signal = None
+    def get_locked_signal(self):
+        return self.__signal
 
 
 class CompoundAction(CompoundEvent):
@@ -81,10 +79,8 @@ class CompoundAction(CompoundEvent):
     def add_locked_signal(self, signal):
         self.__signal = signal
 
-    def try_unlock_signal(self):
-        if self.__signal is not None:
-            self.__signal.unlock()
-            self.__signal = None
+    def get_locked_signal(self):
+        return self.__signal
 
 
 class ActionFactory(EventFactory):

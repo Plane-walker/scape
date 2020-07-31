@@ -3,6 +3,7 @@ import logging
 import signal as listener
 from scape.signal.sensor import Sensor
 from scape.signal.signal import Signal, CompoundSignal
+from scape.core.dispatch import DispatchPool
 
 
 class Slot(Sensor):
@@ -71,6 +72,7 @@ class Slot(Sensor):
             for signal in self.activate_signal:
                 self.update_signal_status(signal)
                 ParserPool.get_instance().process(signal)
+            DispatchPool.get_instance().try_unlock()
 
 
 class ParserPool:

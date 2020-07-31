@@ -2,7 +2,7 @@ import time
 from scape.action.executor import ActionExecutor
 from scape.core.slot import Slot
 from scape.core.dispatch import DispatchPool
-from scape.stream.action_stream import RecorderStream
+from scape.stream.stream import RecorderStream
 
 
 class InnerExecutor(ActionExecutor):

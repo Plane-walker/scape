@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="scape",
-    version="0.9.6",
+    version="0.9.7",
     keywords=["pip", "raspberry pi"],
     description="a framework for raspberry pi developing",
     long_description=open('README.rst').read(),

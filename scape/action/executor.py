@@ -18,4 +18,3 @@ class ActionExecutor(Executor):
         action_func = getattr(self, action.get_name())
         if callable(action_func):
             action_func(*(action.get_args()))
-            action.try_unlock_signal()

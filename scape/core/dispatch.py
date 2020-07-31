@@ -1,14 +1,14 @@
 import importlib
 import multiprocessing
-import time
 from scape.action.executor import Executor
 from scape.conf.settings import INNER_EXECUTORS
 from scape.action.action import Action, CompoundAction, ActionFactory
-from scape.stream.action_stream import ActionStream
+from scape.signal.signal import SignalFactory
+from scape.stream.stream import ActionStream, CompleteStream
 
 
 class Dispatcher(multiprocessing.Process, Executor):
-    def __init__(self, executors, action_stream, lock, stream_info):
+    def __init__(self, executors, action_stream, complete_stream, lock, stream_info):
         super().__init__()
         self.executors = {}
         for executor in executors:
@@ -17,6 +17,7 @@ class Dispatcher(multiprocessing.Process, Executor):
             executor = getattr(module, executor)()
             self.executors[executor.__class__.__name__] = executor
         self.action_stream = action_stream
+        self.complete_stream = complete_stream
         self.lock = lock
         self.action = None
         self.stream_info = stream_info
@@ -26,6 +27,10 @@ class Dispatcher(multiprocessing.Process, Executor):
         if executor not in self.executors.keys():
             raise
         self.executors[executor].execute(action)
+        signal = action.get_locked_signal()
+        if signal is not None:
+            name = signal.get_processor_name() + "." + signal.get_name()
+            self.complete_stream.put([name, signal.get_args()])
 
     def run(self):
         while True:
@@ -61,9 +66,10 @@ class DispatchPool:
             executor = getattr(module, executor)()
             self.inner_executors[executor.__class__.__name__] = executor
         self.action_stream = ActionStream()
+        self.complete_stream = CompleteStream()
         self.stream_info = {'current_stream': self.action_stream}
         for index in range(pool_size):
-            dispatcher = Dispatcher(executors, self.action_stream, multiprocessing.Lock(), self.stream_info)
+            dispatcher = Dispatcher(executors, self.action_stream, self.complete_stream, multiprocessing.Lock(), self.stream_info)
             dispatcher.daemon = True
             dispatcher.start()
 
@@ -81,6 +87,11 @@ class DispatchPool:
         elif isinstance(action, CompoundAction):
             for action_group in action.deserialize():
                 self.action_stream.put(action_group[0])
+
+    def try_unlock(self):
+        if not self.complete_stream.empty():
+            name, args = self.complete_stream.get()
+            SignalFactory.make(name, args).unlock()
 
     def change_stream(self, new_stream):
         self.stream_info['current_stream'] = new_stream

@@ -31,6 +31,30 @@ class ActionStream(EventStream):
     def put(self, action):
         self.__action_stream.put(action)
 
+    def empty(self):
+        return self.__action_stream.empty()
+
+
+class CompleteStream(EventStream):
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    def __init__(self):
+        self.__action_stream = multiprocessing.Queue()
+
+    def get(self):
+        return self.__action_stream.get()
+
+    def put(self, action):
+        self.__action_stream.put(action)
+
+    def empty(self):
+        return self.__action_stream.empty()
+
 
 class RecorderStream(EventStream):
     def __init__(self, action_stream, name):
@@ -49,3 +73,6 @@ class RecorderStream(EventStream):
 
     def get_record_acton(self):
         return self.record_action
+
+    def empty(self):
+        return self.__action_stream.empty()
