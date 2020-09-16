@@ -1,14 +1,14 @@
-from scape.signal.sensor import SignalSensor
+from scape.core.sensor import Sensor
 
 
-class SensorDemo(SignalSensor):
+class BaseSensor(Sensor):
     def __init__(self):
         super().__init__()
 
     @staticmethod
-    def signal_0():
+    def say():
         return 'say'
 
     @staticmethod
-    def signal_1():
+    def hello():
         return 'hello'

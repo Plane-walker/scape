@@ -1,16 +1,7 @@
-import abc
+from scape.core.core import Core
 
 
-class Executor(metaclass=abc.ABCMeta):
-    def __init__(self):
-        pass
-
-    @abc.abstractmethod
-    def execute(self, action):
-        pass
-
-
-class ActionExecutor(Executor):
+class Executor(Core):
     def __init__(self):
         super().__init__()
 

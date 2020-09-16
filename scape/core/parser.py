@@ -1,8 +1,10 @@
-from scape.core.dispatch import DispatchPool
+from scape.framework.dispatch import Dispatcher
+from scape.core.core import Core
 
 
-class Parser:
+class Parser(Core):
     def __init__(self):
+        super().__init__()
         self.rules = {}
         self.signal_count = {}
         self.__received_signal = None
@@ -12,8 +14,6 @@ class Parser:
             signal_list = [signal_list]
         for signal in signal_list:
             def rule_func(received_signal):
-                if received_signal.is_lock():
-                    return
                 self.__received_signal = received_signal
                 rule()
             self.rules[signal] = rule_func
@@ -21,8 +21,10 @@ class Parser:
     def received_signal(self):
         return self.__received_signal
 
-    def process(self, action, transaction=False):
+    @staticmethod
+    def process(action, transaction=True):
+        if action.get_block():
+            return
         if transaction:
-            self.__received_signal.lock()
-            action.add_locked_signal(self.__received_signal)
-        return DispatchPool.get_instance().process(action)
+            action.set_block(True)
+        Dispatcher.get_instance().process(action)

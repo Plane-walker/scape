@@ -28,6 +28,7 @@ DEFAULT_LOGGING = {
 }
 
 INNER_EXECUTORS = [
-    'scape.action.inner_executor.Delayer',
-    'scape.action.inner_executor.Activator'
+    'scape.core.inner_executor.Delayer',
+    'scape.core.inner_executor.Activator',
+    'scape.core.inner_executor.Recorder',
 ]

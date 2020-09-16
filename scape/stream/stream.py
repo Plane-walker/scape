@@ -1,7 +1,7 @@
 import abc
 import time
 import multiprocessing
-from scape.action.action import Action, CompoundAction
+from scape.event.action import Action
 
 
 class EventStream(metaclass=abc.ABCMeta):
@@ -57,22 +57,22 @@ class CompleteStream(EventStream):
 
 
 class RecorderStream(EventStream):
-    def __init__(self, action_stream, name):
+    def __init__(self, action_stream):
         self.__action_stream = action_stream
-        self.record_action = CompoundAction(name)
+        self.record_action_group = []
         self.begin_time = time.time()
 
     def get(self):
         action = self.__action_stream.get()
         end_time = time.time()
-        self.record_action.add_group([Action('Delayer.delay', (end_time - self.begin_time,)), action])
+        self.record_action_group.extend([Action('Delayer.delay', (end_time - self.begin_time,)), action])
         return action
 
     def put(self, action):
         self.__action_stream.put(action)
 
     def get_record_acton(self):
-        return self.record_action
+        return self.record_action_group
 
     def empty(self):
         return self.__action_stream.empty()

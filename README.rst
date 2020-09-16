@@ -29,6 +29,5 @@ Quick start
 The project should print the following words to the screen(the order of words may differ).
 ::
 
-    hello world
-    goodbye world
+    hello
     from scape
