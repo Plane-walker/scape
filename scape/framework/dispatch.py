@@ -74,7 +74,7 @@ class Dispatcher:
     def try_unlock(self):
         if not self.complete_stream.empty():
             name, args = self.complete_stream.get()
-            ActionFactory.make(name, args).set_block(False)
+            ActionFactory.make(name, *args).set_block(False)
 
     def change_stream(self, new_stream):
         self.stream_info['current_stream'] = new_stream
